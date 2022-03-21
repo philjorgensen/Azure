@@ -52,17 +52,17 @@ Clear-Host
 $installedModules = Get-InstalledModule
 try {
 	Write-Host "Checking for Az Module..." -ForegroundColor Green
-	if ($installedModules.Name -notcontains "Az") {    
+	if ($null -eq $installedModules -or $installedModules.Name -notcontains "Az.Storage") {    
     	
 		# Update Az Module if needed
-		Write-Host "Installing Az module..." -ForegroundColor Green
+		Write-Host "Installing Az.Storage module..." -ForegroundColor Green
 		Set-PSRepository -Name PsGallery -InstallationPolicy Trusted
-		Install-Module -Name Az -Repository PSGallery -Force -AllowClobber
-		Import-Module -Name Az -ErrorAction Stop -Verbose:$false
+		Install-Module -Name Az.Storage -Repository PSGallery -Force -AllowClobber
+		Import-Module -Name Az.Storage -ErrorAction Stop -Verbose:$false
 	}
 	else {
-		Write-Host "Importing Az Module..." -ForegroundColor Green
-		Import-Module -Name Az -ErrorAction Stop -Verbose:$false
+		Write-Host "Importing Az.Storage Module..." -ForegroundColor Green
+		Import-Module -Name Az.Storage -ErrorAction Stop -Verbose:$false
 	}
 }
 catch [System.Exception] {
