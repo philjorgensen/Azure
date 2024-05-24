@@ -115,7 +115,7 @@ Get-ChildItem -Path (Join-Path -Path $env:ProgramData -ChildPath "AzCopy\*\azcop
 azcopy.exe -v
 
 Write-Host "Syncing repositories..." -ForegroundColor Green
-azcopy.exe sync $RepositoryPath ($BlobPath + $SasToken) --delete-destination true
+azcopy.exe sync $RepositoryPath ($BlobPath + "?" + $SasToken) --delete-destination true
 
 # Disconnect Azure Account
 Write-Host "Disconnecting from Azure..." -ForegroundColor Green
