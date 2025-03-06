@@ -43,6 +43,10 @@ function Install-AzStorageModule
         Write-Host "Installing Az.Storage module..." -ForegroundColor Green
         Install-Module -Name Az.Storage -Force -AllowClobber -Scope AllUsers
     }
+    else
+    {
+        Write-Host "Az.Storage module already installed." -ForegroundColor Yellow
+    }
     Import-Module -Name Az.Storage -ErrorAction Stop
 }
 
@@ -139,21 +143,21 @@ else
         {
             # Read the XML content
             $xmlContent = Get-Content -Path $file.FullName
-            
+
             # Initialize $modifiedContent as the original $xmlContent at the start of the loop
             $modifiedContent = $xmlContent
             $biosUpdateFound = $false  # Flag to track if BIOS Update Utility is found
-    
+
             # Check if the specific <Desc> tag exists and contains reboot type="5"
             if ($xmlContent -match 'BIOS Update Utility' -and ($xmlContent -match '<Reboot type="5" />'))
             {
                 Write-Host "Found BIOS Update Utility tag in: $($file.FullName)" -ForegroundColor Yellow
                 $biosUpdateFound = $true  # Set the flag
-    
+
                 # Modify Reboot type
                 $modifiedContent = $modifiedContent -replace '<Reboot type="5" />', '<Reboot type="3" />'
             }
-    
+
             # Separate check for firmware package and Reboot type="5"
             if ($xmlContent -match '<Reboot type="5" />')
             {
@@ -162,15 +166,15 @@ else
                 {
                     Write-Host "Found firmware package in: $($file.FullName)" -ForegroundColor Yellow
                 }
-    
+
                 # Modify Reboot type="5" if BIOS Update Utility was not found or additional changes needed
                 $modifiedContent = $modifiedContent -replace '<Reboot type="5" />', '<Reboot type="3" />'
             }
-    
+
             # Convert to single strings for accurate comparison
             $originalContentStr = [string]::Join("`n", $xmlContent)
             $modifiedContentStr = [string]::Join("`n", $modifiedContent)
-    
+
             # Write the modified content back to the XML file only if modifications were made
             if ($modifiedContentStr -ne $originalContentStr)
             {
@@ -188,7 +192,7 @@ else
         Write-Error -Message "Error processing XML files: $($_.Exception.Message)"
         Exit 1
     }
-    
+
 }
 
 # Sync the repository to the blob container
@@ -197,10 +201,10 @@ try
     Write-Host "Syncing repositories..." -ForegroundColor Green
     Start-Process -FilePath "azcopy.exe" `
         -ArgumentList @(
-        "sync", 
-        $RepositoryPath, 
-        "$($BlobPath)?$($sasToken)", 
-        "--delete-destination=true", 
+        "sync",
+        $RepositoryPath,
+        "$($BlobPath)?$($sasToken)",
+        "--delete-destination=true",
         "--log-level=INFO"
     ) `
         -NoNewWindow -Wait
